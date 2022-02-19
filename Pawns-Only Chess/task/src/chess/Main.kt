@@ -10,9 +10,15 @@ var field = MutableList(8){MutableList<String>(8){"|   "}}
 
 const val EXIT = "exit"
 val name = mutableMapOf<Int, String>()
-var nameKey = 1
+//var nameKey = 1
 
 val mainRegex = Regex("[a-h][1-8][a-h][1-8]")
+
+val whiteList = mutableListOf<String>("a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2")
+val blackList = mutableListOf<String>("a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7")
+
+val letList = listOf<String>("a", "b", "c", "d", "e", "f", "g", "h")
+
 
 
 fun main() {
@@ -144,6 +150,65 @@ fun printField(field: MutableList<MutableList<String>>) {
         println()
 
     }
+
+fun splitter(str: String): MutableList<String> {
+   // val startPair = Pair(str.substring(0, 1), str.substring(1,2))
+   // val endPair = Pair(str.substring(2,3), str.substring(3))
+    val splitList = mutableListOf<String>()
+    for (i in str.indices) splitList.add(str[i].toString())
+    return splitList
+
+}
+fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false) {
+    when(nameKey) {
+        1 -> {
+            if (whiteList.contains(moveList[0]+moveList[1])) {
+                when {
+                    (moveList[0]==moveList[2]) && (moveList[1] == "2") && (moveList[3]=="4")
+                            && cellContains(moveList[2]+moveList[3])=="empty"-> {
+                        whiteList.remove(moveList[0]+moveList[1])
+                        whiteList.add(moveList[2]+moveList[3])
+                    }
+                    (moveList[0]==moveList[2]) && (moveList[3].toInt()-moveList[1].toInt()==1)
+                            && cellContains(moveList[2]+moveList[3])=="empty"-> {
+                        whiteList.remove(moveList[0]+moveList[1])
+                        whiteList.add(moveList[2]+moveList[3])
+                    }
+                    (filesMap[moveList[0]]!! - 1 == filesMap[moveList[2]])
+                            && (moveList[3].toInt()-moveList[1].toInt()==1)
+                            && cellContains(moveList[2]+moveList[3])=="black"-> {
+                        whiteList.remove(moveList[0]+moveList[1])
+                        whiteList.add(moveList[2]+moveList[3])
+                        blackList.remove(moveList[2]+moveList[3])
+                    }
+                    (filesMap[moveList[0]]!! + 1 == filesMap[moveList[2]])
+                            && (moveList[3].toInt()-moveList[1].toInt()==1)
+                            && cellContains(moveList[2]+moveList[3])=="black"-> {
+                        whiteList.remove(moveList[0]+moveList[1])
+                        whiteList.add(moveList[2]+moveList[3])
+                        blackList.remove(moveList[2]+moveList[3])
+                    }
+                    flag && (moveList[3]=="6")  && (letList.indexOf(moveList[0])-1 == letList.indexOf(moveList[2]))
+                                && (cellContains("${moveList[2]}${(moveList[3].toInt()-1)}") == "black") -> {
+                                    whiteList.remove(moveList[0]+moveList[1])
+                                    whiteList.add(moveList[2]+moveList[3])
+                                    blackList.remove("${moveList[2]}${(moveList[3].toInt()-1)}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+fun cellContains(cell: String): String {
+    val cellContent: String = when(cell) {
+        in whiteList -> "white"
+        in blackList -> "black"
+        else -> "empty"
+    }
+    return cellContent
+}
 
 
 
