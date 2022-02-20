@@ -30,8 +30,8 @@ fun main() {
     print("Second Player's name:\n>")
     name[-1] = readLine()!!
 
- //   for (i in 0..7) field[1][i] = "| B "
- //   for (i in 0..7) field[6][i] = "| W "
+    for (i in 0..7) field[1][i] = "| B "
+    for (i in 0..7) field[6][i] = "| W "
 
     printField(field)
     turn(1)
@@ -130,7 +130,12 @@ fun checkTurn(startPair: Pair<String, String>, endPair: Pair<String, String>,
 }
 
 fun fieldBuilder(field: MutableList<MutableList<String>>) {
-    //var (col, row) =Pair()
+
+    for (i in field.indices){
+        for (j in 0..7){
+            field[i][j]= "|   "
+        }
+    }
     for (i in whiteList.indices){
         field[whiteList.splitVal(i).second!!][whiteList.splitVal(i).first!!] = "| W "
     }
@@ -157,7 +162,7 @@ fun printField(field: MutableList<MutableList<String>>) {
             " +---", "+---", "+---", "+---", "+---", "+---",
             "+---", "+---", "+"
         )
-
+        print(" ")
         println(chertochki.joinToString(""))
         for (i in 8 downTo 1) {
             print("$i ")
@@ -230,6 +235,55 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                     }
                 }
             }
+        -1 -> {
+            if (blackList.contains(moveList[0]+moveList[1])) {
+                when {
+                    (moveList[0]==moveList[2]) && (moveList[1] == "7") && (moveList[3]=="5")
+                            && cellContains(moveList[2]+moveList[3])=="empty"-> {
+                        blackList.remove(moveList[0]+moveList[1])
+                        blackList.add(moveList[2]+moveList[3])
+                      //  println(whiteList)
+                        fieldBuilder(field)
+                        turn(nameKey*(-1))
+                    }
+                    (moveList[0]==moveList[2]) && (moveList[1].toInt()-moveList[3].toInt()==1)
+                            && cellContains(moveList[2]+moveList[3])=="empty"-> {
+                        blackList.remove(moveList[0]+moveList[1])
+                        blackList.add(moveList[2]+moveList[3])
+                       // println(whiteList)
+                        fieldBuilder(field)
+                        turn(nameKey*(-1))
+                    }
+                    (filesMap[moveList[0]]!! - 1 == filesMap[moveList[2]])
+                            && (moveList[1].toInt()-moveList[3].toInt()==1)
+                            && cellContains(moveList[2]+moveList[3])=="white"-> {
+                        blackList.remove(moveList[0]+moveList[1])
+                        blackList.add(moveList[2]+moveList[3])
+                        whiteList.remove(moveList[2]+moveList[3])
+                        fieldBuilder(field)
+                        turn(nameKey*(-1))
+                    }
+                    (filesMap[moveList[0]]!! + 1 == filesMap[moveList[2]])
+                            && (moveList[1].toInt()-moveList[3].toInt()==1)
+                            && cellContains(moveList[2]+moveList[3])=="white"-> {
+                        blackList.remove(moveList[0]+moveList[1])
+                        blackList.add(moveList[2]+moveList[3])
+                        whiteList.remove(moveList[2]+moveList[3])
+                        fieldBuilder(field)
+                        turn(nameKey*(-1))
+                    }
+                    flag && (moveList[3]=="6")  && (letList.indexOf(moveList[0])-1 == letList.indexOf(moveList[2]))
+                                && (cellContains("${moveList[2]}${(moveList[3].toInt()+1)}") == "white") -> {
+                        blackList.remove(moveList[0]+moveList[1])
+                        blackList.add(moveList[2]+moveList[3])
+                        whiteList.remove("${moveList[2]}${(moveList[3].toInt()-1)}")
+                        fieldBuilder(field)
+                        turn(nameKey*(-1))
+                        }
+                    }
+                }
+            }
+
         }
     }
 
