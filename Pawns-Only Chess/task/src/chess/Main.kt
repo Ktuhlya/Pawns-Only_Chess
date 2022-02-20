@@ -20,6 +20,8 @@ val blackList = mutableListOf<String>("a7", "b7", "c7", "d7", "e7", "f7", "g7", 
 
 val letList = listOf<String>("a", "b", "c", "d", "e", "f", "g", "h")
 
+var flag: Boolean = false
+
 
 
 fun main() {
@@ -44,9 +46,6 @@ fun turn(nameKey: Int = 1) {
     print("${name[nameKey]}'s turn:\n> ")
     val str = readln().trim()
     if (str.matches(mainRegex)) {
-        val startPair = Pair(str.substring(0, 1), str.substring(1,2))
-        val endPair = Pair(str.substring(2,3), str.substring(3))
-        //checkTurn(startPair, endPair, nameKey)
             moveValid(splitter(str), nameKey)
     } else {
         if (str == EXIT) {
@@ -57,75 +56,6 @@ fun turn(nameKey: Int = 1) {
             println("Invalid Input")
             turn(nameKey)
         }
-    }
-}
-
-fun checkTurn(startPair: Pair<String, String>, endPair: Pair<String, String>,
-              nameKey: Int) {
-
-    when (nameKey) {
-        // White
-        1 -> {
-            if (field[ranksMap[startPair.second.toInt()]!!][filesMap[startPair.first]!!] == "| W ") {
-                when {
-                    ((startPair.second.toInt() == 2) && (endPair.second.toInt() == 4)
-                            && (startPair.first == endPair.first)
-                            && (field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] == "|   ")) -> {
-                        field[ranksMap[startPair.second.toInt()]!!][filesMap[startPair.first]!!] = "|   "
-                        field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] = "| W "
-                        printField(field)
-                        turn(nameKey*(-1))
-                    }
-                    (endPair.second.toInt() - startPair.second.toInt() == 1)
-                            && (startPair.first == endPair.first)
-                            && (field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] == "|   ")-> {
-                        field[ranksMap[startPair.second.toInt()]!!][filesMap[startPair.first]!!] = "|   "
-                        field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] = "| W "
-                        printField(field)
-                        turn(nameKey*(-1))
-                    }
-                    else -> {
-                        println("Invalid Input")
-                        turn(nameKey)
-                    }
-                }
-            }else{
-                println("No white pawn at ${startPair.toList().joinToString("")}")
-                turn(nameKey)
-            }
-        }
-        // Black
-         -1 -> {
-            if (field[ranksMap[startPair.second.toInt()]!!][filesMap[startPair.first]!!] == "| B ") {
-                when {
-                    ((startPair.second.toInt() == 7) && (endPair.second.toInt() == 5)
-                            && (startPair.first == endPair.first)
-                            && (field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] == "|   ")) -> {
-                        field[ranksMap[startPair.second.toInt()]!!][filesMap[startPair.first]!!] = "|   "
-                        field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] = "| B "
-                        printField(field)
-                        turn(nameKey*(-1))
-                    }
-                    (startPair.second.toInt() - endPair.second.toInt() == 1)
-                            && (startPair.first == endPair.first)
-                            && (field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] == "|   ")-> {
-                        field[ranksMap[startPair.second.toInt()]!!][filesMap[startPair.first]!!] = "|   "
-                        field[ranksMap[endPair.second.toInt()]!!][filesMap[endPair.first]!!] = "| B "
-                        printField(field)
-                        turn(nameKey*(-1))
-                    }
-                    else -> {
-                        println("Invalid Input")
-                        turn(nameKey)
-                    }
-                }
-            }else{
-                println("No black pawn at ${startPair.toList().joinToString("")}")
-                turn(nameKey)
-            }
-        }
-
-
     }
 }
 
@@ -142,14 +72,12 @@ fun fieldBuilder(field: MutableList<MutableList<String>>) {
     for (i in blackList.indices){
         field[blackList.splitVal(i).second!!][blackList.splitVal(i).first!!] = "| B "
     }
-    println(whiteList)
-    println(blackList)
+  //  println(whiteList) //  println(blackList)
     printField(field)
 
 }
 
 fun MutableList<String>.splitVal(indexD: Int): Pair<Int?, Int?> {
-  //  var str: String = this[]
     val row = ranksMap[this[indexD].substring(1).toInt()]
     val col = filesMap[this[indexD].substring(0,1)]
     return Pair(col, row)
@@ -157,7 +85,6 @@ fun MutableList<String>.splitVal(indexD: Int): Pair<Int?, Int?> {
 
 
 fun printField(field: MutableList<MutableList<String>>) {
-
         val chertochki = listOf(
             " +---", "+---", "+---", "+---", "+---", "+---",
             "+---", "+---", "+"
@@ -185,7 +112,7 @@ fun splitter(str: String): MutableList<String> {
     return splitList
 
 }
-fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false) {
+fun moveValid(moveList: MutableList<String>, nameKey: Int) {
     when(nameKey) {
         1 -> {
             if (whiteList.contains(moveList[0]+moveList[1])) {
@@ -194,6 +121,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                             && cellContains(moveList[2]+moveList[3])=="empty"-> {
                         whiteList.remove(moveList[0]+moveList[1])
                         whiteList.add(moveList[2]+moveList[3])
+                        flag = true
+
                       //  println(whiteList)
                         fieldBuilder(field)
                         turn(nameKey*(-1))
@@ -202,6 +131,7 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                             && cellContains(moveList[2]+moveList[3])=="empty"-> {
                         whiteList.remove(moveList[0]+moveList[1])
                         whiteList.add(moveList[2]+moveList[3])
+                        if (flag) flag=false
                        // println(whiteList)
                         fieldBuilder(field)
                         turn(nameKey*(-1))
@@ -212,6 +142,7 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                         whiteList.remove(moveList[0]+moveList[1])
                         whiteList.add(moveList[2]+moveList[3])
                         blackList.remove(moveList[2]+moveList[3])
+                        if (flag) flag=false
                         fieldBuilder(field)
                         turn(nameKey*(-1))
                     }
@@ -221,6 +152,7 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                         whiteList.remove(moveList[0]+moveList[1])
                         whiteList.add(moveList[2]+moveList[3])
                         blackList.remove(moveList[2]+moveList[3])
+                        if (flag) flag=false
                         fieldBuilder(field)
                         turn(nameKey*(-1))
                     }
@@ -229,12 +161,22 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                         whiteList.remove(moveList[0]+moveList[1])
                         whiteList.add(moveList[2]+moveList[3])
                         blackList.remove("${moveList[2]}${(moveList[3].toInt()-1)}")
+                        if (flag) flag=false
                         fieldBuilder(field)
                         turn(nameKey*(-1))
                         }
+                    else -> {
+                        println("Invalid Input")
+                        turn(nameKey)
                     }
-                }
+                    }
+
+                }else{
+                println("No white pawn at ${moveList[0]+moveList[1]}")
+                turn(nameKey)
             }
+            }
+
         -1 -> {
             if (blackList.contains(moveList[0]+moveList[1])) {
                 when {
@@ -242,6 +184,7 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                             && cellContains(moveList[2]+moveList[3])=="empty"-> {
                         blackList.remove(moveList[0]+moveList[1])
                         blackList.add(moveList[2]+moveList[3])
+                        flag = true
                       //  println(whiteList)
                         fieldBuilder(field)
                         turn(nameKey*(-1))
@@ -250,6 +193,7 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                             && cellContains(moveList[2]+moveList[3])=="empty"-> {
                         blackList.remove(moveList[0]+moveList[1])
                         blackList.add(moveList[2]+moveList[3])
+                        if (flag) flag=false
                        // println(whiteList)
                         fieldBuilder(field)
                         turn(nameKey*(-1))
@@ -260,6 +204,7 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                         blackList.remove(moveList[0]+moveList[1])
                         blackList.add(moveList[2]+moveList[3])
                         whiteList.remove(moveList[2]+moveList[3])
+                        if (flag) flag=false
                         fieldBuilder(field)
                         turn(nameKey*(-1))
                     }
@@ -269,6 +214,7 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                         blackList.remove(moveList[0]+moveList[1])
                         blackList.add(moveList[2]+moveList[3])
                         whiteList.remove(moveList[2]+moveList[3])
+                        if (flag) flag=false
                         fieldBuilder(field)
                         turn(nameKey*(-1))
                     }
@@ -277,12 +223,20 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int, flag: Boolean = false
                         blackList.remove(moveList[0]+moveList[1])
                         blackList.add(moveList[2]+moveList[3])
                         whiteList.remove("${moveList[2]}${(moveList[3].toInt()-1)}")
+                        if (flag) flag=false
                         fieldBuilder(field)
                         turn(nameKey*(-1))
                         }
+                    else -> {
+                        println("Invalid Input")
+                        turn(nameKey)
                     }
-                }
+                    }
+                }else{
+                println("No black pawn at ${moveList[0]+moveList[1]}")
+                turn(nameKey)
             }
+        }
 
         }
     }
