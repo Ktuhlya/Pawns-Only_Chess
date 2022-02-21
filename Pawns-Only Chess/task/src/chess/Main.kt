@@ -1,5 +1,6 @@
 package chess
 
+import javax.swing.text.StyledEditorKit
 import kotlin.system.exitProcess
 import chess.ranksMap as ranksMap
 
@@ -23,7 +24,6 @@ val letList = listOf<String>("a", "b", "c", "d", "e", "f", "g", "h")
 var flag: Boolean = false
 
 
-
 fun main() {
 
     println("Pawns-Only Chess")
@@ -37,7 +37,6 @@ fun main() {
 
     printField(field)
     turn(1)
-
 
 }
 
@@ -72,9 +71,7 @@ fun fieldBuilder(field: MutableList<MutableList<String>>) {
     for (i in blackList.indices){
         field[blackList.splitVal(i).second!!][blackList.splitVal(i).first!!] = "| B "
     }
-  //  println(whiteList) //  println(blackList)
     printField(field)
-
 }
 
 fun MutableList<String>.splitVal(indexD: Int): Pair<Int?, Int?> {
@@ -101,12 +98,9 @@ fun printField(field: MutableList<MutableList<String>>) {
         print(" ")
         println("   a   b   c   d   e   f   g   h")
         println()
-
     }
 
 fun splitter(str: String): MutableList<String> {
-   // val startPair = Pair(str.substring(0, 1), str.substring(1,2))
-   // val endPair = Pair(str.substring(2,3), str.substring(3))
     val splitList = mutableListOf<String>()
     for (i in str.indices) splitList.add(str[i].toString())
     return splitList
@@ -122,9 +116,10 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         whiteList.remove(moveList[0]+moveList[1])
                         whiteList.add(moveList[2]+moveList[3])
                         flag = true
-
                       //  println(whiteList)
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     (moveList[0]==moveList[2]) && (moveList[3].toInt()-moveList[1].toInt()==1)
@@ -134,6 +129,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         if (flag) flag=false
                        // println(whiteList)
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     (filesMap[moveList[0]]!! - 1 == filesMap[moveList[2]])
@@ -144,6 +141,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         blackList.remove(moveList[2]+moveList[3])
                         if (flag) flag=false
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     (filesMap[moveList[0]]!! + 1 == filesMap[moveList[2]])
@@ -154,6 +153,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         blackList.remove(moveList[2]+moveList[3])
                         if (flag) flag=false
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     flag && (moveList[3]=="6")  && (letList.indexOf(moveList[0])-1 == letList.indexOf(moveList[2]))
@@ -163,6 +164,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         blackList.remove("${moveList[2]}${(moveList[3].toInt()-1)}")
                         if (flag) flag=false
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                         }
                     else -> {
@@ -187,6 +190,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         flag = true
                       //  println(whiteList)
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     (moveList[0]==moveList[2]) && (moveList[1].toInt()-moveList[3].toInt()==1)
@@ -196,6 +201,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         if (flag) flag=false
                        // println(whiteList)
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     (filesMap[moveList[0]]!! - 1 == filesMap[moveList[2]])
@@ -206,6 +213,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         whiteList.remove(moveList[2]+moveList[3])
                         if (flag) flag=false
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     (filesMap[moveList[0]]!! + 1 == filesMap[moveList[2]])
@@ -216,6 +225,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         whiteList.remove(moveList[2]+moveList[3])
                         if (flag) flag=false
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                     }
                     flag && (moveList[3]=="6")  && (letList.indexOf(moveList[0])-1 == letList.indexOf(moveList[2]))
@@ -225,6 +236,8 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
                         whiteList.remove("${moveList[2]}${(moveList[3].toInt()-1)}")
                         if (flag) flag=false
                         fieldBuilder(field)
+                        checkWin()
+                        checkStalemate(nameKey*(-1))
                         turn(nameKey*(-1))
                         }
                     else -> {
@@ -241,6 +254,51 @@ fun moveValid(moveList: MutableList<String>, nameKey: Int) {
         }
     }
 
+fun checkStalemate(nameKey: Int) {
+    val davaiPoka = "Stalemate!\nBye!"
+    when (nameKey) {
+        1 -> {
+            if (perdakGoritW()) {
+                println(davaiPoka)
+                exitProcess(0)
+            }
+        }
+        -1 -> {
+            if (perdakGoritB()) {
+              println(davaiPoka)
+                exitProcess(0)
+            }
+        }
+    }
+}
+fun checkWin() {
+    val regexWhite = Regex("\\w8")
+    val regexBlack = Regex("\\w1")
+    if (blackList.isEmpty()) {
+        println("White Wins!")
+        println("Bye!")
+        exitProcess(0)
+    }
+    if (whiteList.isEmpty()) {
+        println("Black Wins!")
+        println("Bye!")
+        exitProcess(0)
+    }
+    for (i in whiteList.indices) {
+        if (whiteList[i].matches(regexWhite)) {
+            println("White Wins!")
+            println("Bye!")
+            exitProcess(0)
+        }
+    }
+    for (i in blackList.indices) {
+        if (blackList[i].matches(regexBlack)) {
+            println("Black Wins!")
+            println("Bye!")
+            exitProcess(0)
+        }
+    }
+}
 
 fun cellContains(cell: String): String {
     val cellContent: String = when(cell) {
@@ -250,6 +308,47 @@ fun cellContains(cell: String): String {
     }
     return cellContent
 }
+
+fun perdakGoritW(): Boolean {
+    var count: Int = 0
+    for (i in whiteList.indices){
+        var fw = Pair(whiteList.splitVal(i).second!! - 1, whiteList.splitVal(i).first)
+        var left = Pair(whiteList.splitVal(i).second!! - 1, whiteList.splitVal(i).first!! - 1)
+        var right = Pair(whiteList.splitVal(i).second!! - 1, whiteList.splitVal(i).first!! + 1)
+        if (left.second < 0) left = Pair (left.first, 1)
+        if (right.second > 7) right = Pair (right.first, 6)
+
+
+        if (field[fw.first][fw.second!!] != "|   ") {
+            if ((field[left.first][left.second] != "| B ")
+                && (field[right.first][right.second] != "| B ")){
+               count+=1
+            }
+        }
+    }
+    return whiteList.size == count
+}
+
+fun perdakGoritB(): Boolean {
+    var count : Int = 0
+    for (i in blackList.indices) {
+        var fw = Pair(blackList.splitVal(i).second!! + 1, blackList.splitVal(i).first)
+        var left = Pair(blackList.splitVal(i).second!! + 1, blackList.splitVal(i).first!! - 1)
+        var right = Pair(blackList.splitVal(i).second!! + 1, blackList.splitVal(i).first!! + 1)
+        if (left.second < 0) left = Pair (left.first, 1)
+        if (right.second > 7) right = Pair (right.first, 6)
+        if (field[fw.first][fw.second!!] != "|   ") {
+            if ((field[left.first][left.second] != "| W ")
+                && (field[right.first][right.second] != "| W ")) {
+              count +=1
+               // println("count $count")
+               // println("size ${blackList.size}")
+            }
+        }
+    }
+    return blackList.size == count
+}
+
 
 
 
